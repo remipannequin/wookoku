@@ -203,7 +203,7 @@ class Board:
         """
         for e in piece.elements:
             #print(i+ e[0], j+ e[1])
-            if i + e[0] > 9 or j + e[1] > 9:
+            if i + e[0] not in range(9) or j + e[1] not in range(9):
                 return False
             if self.at(i + e[0], j + e[1]):
                 return False
