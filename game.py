@@ -69,10 +69,14 @@ class Game:
         self.gen = PiecesGenerator(seed)
         self.next = self.gen.next()
         self.score = 0
+        self.n_rows = 9
+        self.n_cols = 9
         
     def play(self, i, j):
         """
         """
+        if i not in range(9) or j not in range(9):
+             return False
         if not self.board.place(self.next, i, j):
             return False
         s = self.board.reduce()
@@ -106,6 +110,7 @@ if __name__ == '__main__':
     g = Game()
     while not g.over():
         print(g.board)
+        print('score: %d' %g.score)
         print('Next piece:')
         print(g.next)
         loc = input('location ? ')
@@ -113,4 +118,4 @@ if __name__ == '__main__':
         if g.fit(i, j):
             g.play(i, j)
         else:
-            print('does fit here')
+            print('piece does not fit there')
