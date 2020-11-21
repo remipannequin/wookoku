@@ -73,15 +73,17 @@ class Game:
         self.n_cols = 9
         
     def play(self, i, j):
-        """
+        """place next piece at location i, j on the board
+        :return: the list of cells that disapeared (if any)
         """
         if i not in range(9) or j not in range(9):
-             return False
+             return set()
         if not self.board.place(self.next, i, j):
-            return False
-        s = self.board.reduce()
+            return set()
+        (s, removed) = self.board.reduce()
         self.next = self.gen.next()
         self.score += s
+        return {(e // 9, e % 9) for e in removed}
     
     def fit(self, i, j):
         """Test whether next piece fit at i, j

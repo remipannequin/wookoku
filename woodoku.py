@@ -30,6 +30,8 @@ __status__ = "Development"
 WHITE = 255, 255, 255
 P_COLOR = 255,255,255
 ZONE_COLOR = 125,125,125
+REM_COLOR = pygame.color.THECOLORS['gold']
+REMOVE_TICK = 3
 
 class Window:
 
@@ -40,7 +42,8 @@ class Window:
         self.seed = seed
         self.reset()
         self.compute_size()
-
+        self.removed = set()
+        self.removed_ts = 0
 
     def compute_size(self):
         height = 800
@@ -122,6 +125,19 @@ class Window:
                     h = self.pix(row+1) - y - 1
                     self.win.fill(P_COLOR, [x, y, w, h])
         
+        # Draw removed pieces
+        for (r, c) in self.removed:
+            x = self.pix(c) + 1
+            y = self.pix(r) + 1
+            w = self.pix(c+1) - x -1
+            h = self.pix(r+1) - y - 1
+            self.win.fill(REM_COLOR, [x, y, w, h])
+        if self.removed_ts == 0:
+            self.removed.clear()
+        else:
+            self.removed_ts -= 1
+        
+        
         # Draw next
         next_surf = pygame.Surface((80, 80))
         next_p = self.g.next
@@ -152,7 +168,8 @@ class Window:
                 if x > self.pix(0) and y > self.pix(0) and x <  self.pix(9) and y < self.pix(9):
                     col = self.grid(x)
                     row = self.grid(y)
-                    self.g.play(row, col)
+                    self.removed = self.g.play(row, col)
+                    self.removed_ts = REMOVE_TICK
                     
                 elif self.replay_bt.collidepoint(event.pos):
                     self.reset()

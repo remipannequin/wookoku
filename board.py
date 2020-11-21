@@ -92,6 +92,7 @@ class Board:
         """Clear a line of the board
         >>> b = Board(data=[True]*81)
         >>> b.clearLine(5)
+        range(45, 54)
         >>> print(b)
         +-----------------+
         |X X X X X X X X X|
@@ -107,13 +108,20 @@ class Board:
         """
         for k in Board._lineIdx(i):
             self.cells[k] = False
+        return Board._lineIdx(i)
     
     def _zoneIdx(i):
         """Index of cells in zone i
+        
+        >>> Board._zoneIdx(0)
+        [0, 1, 2, 9, 10, 11, 18, 19, 20]
+        >>> Board._zoneIdx(4)
+        [30, 31, 32, 39, 40, 41, 48, 49, 50]
         """
+        base = [0, 1, 2, 9, 10, 11, 18, 19, 20]
         l = (i // 3) * 3
-        c = ((i % 3) - 1) * 3
-        return [e+(l*9)+c for e in [0, 1, 2, 9, 10, 11, 18, 19, 20]]
+        c = (i % 3) * 3
+        return [e+(l*9)+c for e in base]
     
     def zone(self, i):
         """return the 9 cells in a zone.
@@ -125,14 +133,15 @@ class Board:
         """clear a zone of the board
         >>> b = Board(data=[True]*81)
         >>> b.clearZone(4)
+        [30, 31, 32, 39, 40, 41, 48, 49, 50]
         >>> print(b)
         +-----------------+
         |X X X X X X X X X|
         |X X X X X X X X X|
         |X X X X X X X X X|
-        |      X X X X X X|
-        |      X X X X X X|
-        |      X X X X X X|
+        |X X X       X X X|
+        |X X X       X X X|
+        |X X X       X X X|
         |X X X X X X X X X|
         |X X X X X X X X X|
         |X X X X X X X X X|
@@ -140,6 +149,7 @@ class Board:
         """
         for k in Board._zoneIdx(i):
             self.cells[k] = False
+        return Board._zoneIdx(i)
     
     def _colIdx(i):
         """return cell indexes of column i
@@ -155,6 +165,7 @@ class Board:
         """clear a column of the board
         >>> b = Board(data=[True]*81)
         >>> b.clearColumn(3)
+        [3, 12, 21, 30, 39, 48, 57, 66, 75]
         >>> print(b)
         +-----------------+
         |X X X   X X X X X|
@@ -170,6 +181,7 @@ class Board:
         """
         for k in Board._colIdx(i):
             self.cells[k] = False
+        return Board._colIdx(i)
 
     def at(self, i, j):
         """return True if the cell at line i, col j is occupied
@@ -248,8 +260,11 @@ class Board:
         :return: the number of matches (lines, col or zones)
         
         >>> b = Board(data=[True]*81)
-        >>> b.reduce()
+        >>> (s, removed) = b.reduce()
+        >>> s
         27
+        >>> removed == set(range(81))
+        True
         >>> print(b)
         +-----------------+
         |                 |
@@ -266,6 +281,8 @@ class Board:
         lines =[]
         cols = []
         zones = []
+        #set of cells that has een removed
+        removed = set()
         # First find them
         for i in range(9):
             l = self.line(i)
@@ -279,12 +296,12 @@ class Board:
                 zones.append(i)
         # Then remove them
         for l in lines:
-            self.clearLine(l)
+            removed.update(self.clearLine(l))
         for c in cols:
-            self.clearColumn(c)
+            removed.update(self.clearColumn(c))
         for z in zones:
-            self.clearZone(z)
-        return len(lines)+len(cols)+len(zones)
+            removed.update(self.clearZone(z))
+        return (len(lines)+len(cols)+len(zones), removed)
         
         
 class Piece:
