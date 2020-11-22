@@ -14,6 +14,12 @@ disapears.
 
 The game ends when a piece cannot be placed on the board.
 
+Scoring:
+* each time a piece is placed on the board, the score is incremented by the
+  number of elements in the piece
+ * for each line, column or zone cleared, score is incremented by 18
+ * there is a score bonus when simultaneously clearing several lines, col or
+   zones : 10 for 2, 20 for 3, etc...
 """
 
 from random import Random
@@ -58,7 +64,7 @@ class PiecesGenerator:
     def next(self):
         """return the next piece
         """
-        num = self.rng.randint(0, len(PIECES)-1)
+        num = self.rng.randint(0, len(PIECES) - 1)
         return (Piece(PIECES[num]), num)
         
         
@@ -82,8 +88,10 @@ class Game:
         if not self.board.place(self.next, i, j):
             return set()
         (s, removed) = self.board.reduce()
+        self.score += len(self.next.elements) + s * 18
+        if s > 0:
+            self.score += (s - 1) * 10
         (self.next, self.next_num) = self.gen.next()
-        self.score += s
         return {(e // 9, e % 9) for e in removed}
     
     def fit(self, i, j):
