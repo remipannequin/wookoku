@@ -58,7 +58,8 @@ class PiecesGenerator:
     def next(self):
         """return the next piece
         """
-        return Piece(self.rng.choice(PIECES))
+        num = self.rng.randint(0, len(PIECES)-1)
+        return (Piece(PIECES[num]), num)
         
         
 class Game:
@@ -67,7 +68,7 @@ class Game:
         """
         self.board = Board()
         self.gen = PiecesGenerator(seed)
-        self.next = self.gen.next()
+        (self.next, self.next_num) = self.gen.next()
         self.score = 0
         self.n_rows = 9
         self.n_cols = 9
@@ -81,7 +82,7 @@ class Game:
         if not self.board.place(self.next, i, j):
             return set()
         (s, removed) = self.board.reduce()
-        self.next = self.gen.next()
+        (self.next, self.next_num) = self.gen.next()
         self.score += s
         return {(e // 9, e % 9) for e in removed}
     
