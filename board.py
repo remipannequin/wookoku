@@ -69,7 +69,23 @@ class Board:
             r +=('|%s|\n' % ' '.join(['X' if e else ' ' for e in self.line(l)]))
         r += line
         return r
+    
+    def hash(self):
+        """Get an int representing this board state
         
+        >>> b = Board()
+        >>> b.hash()
+        0
+        >>> b = Board( data = [True]*81)
+        >>> b.hash() == pow(2, 81) - 1
+        True
+        """
+        n = 0
+        for i in range(81):
+            if self.cells[i]:
+                n += pow(2, i)
+        return n
+    
     def _lineIdx(i):
         """Index of the cells of a line.
         """
@@ -302,8 +318,8 @@ class Board:
         for z in zones:
             removed.update(self.clearZone(z))
         return (len(lines)+len(cols)+len(zones), removed)
-        
-        
+    
+
 class Piece:
     """A piece is represented by the list of its elements :
     each element is a tuple of (line, column coordinate). By convention,
