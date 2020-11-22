@@ -125,18 +125,6 @@ class Window:
                     h = self.pix(row+1) - y - 1
                     self.win.fill(P_COLOR, [x, y, w, h])
         
-        # Draw removed pieces
-        for (r, c) in self.removed:
-            x = self.pix(c) + 1
-            y = self.pix(r) + 1
-            w = self.pix(c+1) - x -1
-            h = self.pix(r+1) - y - 1
-            self.win.fill(REM_COLOR, [x, y, w, h])
-        if self.removed_ts == 0:
-            self.removed.clear()
-        else:
-            self.removed_ts -= 1
-        
         # Draw next
         next_surf = pygame.Surface((80, 80))
         next_p = self.g.next
@@ -160,7 +148,17 @@ class Window:
                     h = self.pix(r+1) - y - 1
                     self.win.fill(P_HOVER_COLOR, [x, y, w, h])
         
-        
+        # Draw removed pieces
+        for (r, c) in self.removed:
+            x = self.pix(c) + 1
+            y = self.pix(r) + 1
+            w = self.pix(c+1) - x -1
+            h = self.pix(r+1) - y - 1
+            self.win.fill(REM_COLOR, [x, y, w, h])
+        if self.removed_ts == 0:
+            self.removed.clear()
+        else:
+            self.removed_ts -= 1
         
         #Display game over / play again
         if self.game_over:
