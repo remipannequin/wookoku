@@ -29,6 +29,7 @@ __status__ = "Development"
 #couleur des pieces
 WHITE = 255, 255, 255
 P_COLOR = 255,255,255
+P_HOVER_COLOR = 75, 75, 75
 ZONE_COLOR = 125,125,125
 REM_COLOR = pygame.color.THECOLORS['gold']
 REMOVE_TICK = 3
@@ -103,19 +104,18 @@ class Window:
             h = self.pix(r+3) - y
             self.win.fill(ZONE_COLOR, [x, y, w, h])
         # Draw lines
-        for col in range(9+1):
+        for col in range(10):
             pygame.draw.line(self.win,
                     WHITE, 
                     [self.pix(col), self.pix(0)],
                     [self.pix(col), self.pix(9)])
-        for row in range(9+1):
+        for row in range(10):
             pygame.draw.line(self.win,
                     WHITE, 
                     [self.pix(0), self.pix(row)],
                     [self.pix(9), self.pix(row)])
         
         # Draw Pieces
-        r = 0.9
         for row in range(9):
             for col in range(9):
                 if self.g.board.at(row, col):
@@ -137,13 +137,30 @@ class Window:
         else:
             self.removed_ts -= 1
         
-        
         # Draw next
         next_surf = pygame.Surface((80, 80))
         next_p = self.g.next
         for e in next_p.elements:
             next_surf.fill(WHITE, [e[1]*20+1, e[0]*20+1, 18, 18])
         self.win.blit(next_surf, (self.pix(4.5), self.pix(9.1)))
+        
+        # Display current piece position
+        x,y = pygame.mouse.get_pos()
+        #savoir dans quelle case se situe le clic
+        if x > self.pix(0) and y > self.pix(0) and x <  self.pix(9) and y < self.pix(9):
+            base_c = self.grid(x)
+            base_r = self.grid(y)
+            if self.g.fit(base_r, base_c):
+                for e in next_p.elements:
+                    c = base_c + e[1]
+                    r = base_r + e[0] 
+                    x = self.pix(c) + 1
+                    y = self.pix(r) + 1
+                    w = self.pix(c+1) - x -1
+                    h = self.pix(r+1) - y - 1
+                    self.win.fill(P_HOVER_COLOR, [x, y, w, h])
+        
+        
         
         #Display game over / play again
         if self.game_over:
@@ -173,10 +190,7 @@ class Window:
                     
                 elif self.replay_bt.collidepoint(event.pos):
                     self.reset()
-                
-            elif event.type == pygame.KEYDOWN and event.key == 32 and not self.game_over:
-                step(self.g)
-                self.hp.build_eval_cache()
+
 
     def loop(self):
         clock = pygame.time.Clock()
