@@ -69,10 +69,15 @@ class PiecesGenerator:
         
         
 class Game:
-    def __init__(self, seed=None):
+    def __init__(self, seed=None, board=None):
         """Create a new game instance
+        :param seed: the random seed to use
+        :param board: initialized the board with this data
         """
-        self.board = Board()
+        if board:
+            self.board = board
+        else:
+            self.board = Board()
         self.gen = PiecesGenerator(seed)
         (self.next, self.next_num) = self.gen.next()
         self.score = 0
@@ -88,11 +93,17 @@ class Game:
         if not self.board.place(self.next, i, j):
             return set()
         (s, removed) = self.board.reduce()
-        self.score += len(self.next.elements) + s * 18
-        if s > 0:
-            self.score += (s - 1) * 10
+        self.score += Game.evalScore(self.next, s)
         (self.next, self.next_num) = self.gen.next()
         return {(e // 9, e % 9) for e in removed}
+    
+    def evalScore(placed, removed_groups):
+        """Compute the score increment
+        """
+        v = len(placed.elements) + removed_groups * 18
+        if removed_groups > 0:
+            v += (removed_groups - 1) * 10
+        return v
     
     def fit(self, i, j):
         """Test whether next piece fit at i, j
@@ -106,6 +117,7 @@ class Game:
             for j in range(9):
                 if self.board.fit(self.next, i, j):
                     return False
+        self.over = True
         return True
     
     def displayPossiblePieces():
@@ -115,8 +127,23 @@ class Game:
         for c in PIECES:
             print(Piece(c))
             print('--------------')
-        
-        
+    
+    def actions(self):
+        """return all the possible actions for this state, and the resulting
+        states.
+        """
+        actions = []
+        for i in range(9):
+            for j in range(9):
+                if self.board.fit(self.next, i, j):
+                    new_board = Board(data = list(self.board.cells))
+                    new_board.place(self.next, i, j)
+                    (n_groups, removed) = new_board.reduce()
+                    reward = Game.evalScore(self.next, n_groups)
+                    actions.append(((i, j), reward, new_board))
+        return actions
+
+
 if __name__ == '__main__':
     g = Game()
     while not g.over():

@@ -12,10 +12,14 @@ Options:
 """
 
 import sys
+import os
+import pickle
+
 from docopt import docopt
 import pygame
 
 from game import Game
+from board import Board
 
 _author__="Rémi Pannequin"
 __copyright__ = "Copyright 2020"
@@ -36,7 +40,7 @@ REMOVE_TICK = 3
 
 class Window:
 
-    def __init__(self, seed = None):
+    def __init__(self, seed = None, values = dict()):
         pygame.init()
         pygame.font.init()
         #variables
@@ -45,6 +49,8 @@ class Window:
         self.compute_size()
         self.removed = set()
         self.removed_ts = 0
+        self.values = values
+
 
     def compute_size(self):
         height = 800
@@ -148,6 +154,22 @@ class Window:
                     h = self.pix(r+1) - y - 1
                     self.win.fill(P_HOVER_COLOR, [x, y, w, h])
         
+        # Evaluate current state and possible next state
+        #h0 = self.g.board.hash()
+        #n0 = self.g.next_num
+        #if h0 in values:
+        #    print(values[h0][n0])
+        #else:
+        #    print('no eval found for current state')
+        #if x > self.pix(0) and y > self.pix(0) and x <  self.pix(9) and y < self.pix(9):
+        #    new_board = Board(data = list(self.g.board.cells))
+        #    new_board.place(self.g.next, base_r, base_c)
+        #    h1 = new_board.hash()
+        #    if h1 in values:
+        #        print(sum(values[h1])/len(values[h1]))
+        #    else:
+        #        print('no eval for next state')
+        
         # Draw removed pieces
         for (r, c) in self.removed:
             x = self.pix(c) + 1
@@ -211,7 +233,7 @@ if __name__=='__main__':
         s = int(args['--seed'])
     else:
         s = None
-    w = Window(seed = s)
+    w = Window(seed = s, values = values)
     w.loop()
     
 
