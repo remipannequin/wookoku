@@ -53,10 +53,10 @@ class Window:
 
 
     def compute_size(self):
-        height = 800
-        width = round(height*(9/(9+1.5)))+20
-        self.l = round((width-20)/9)
-        self.win = pygame.display.set_mode((width, height))
+        self.height = 800
+        self.width = round(self.height*(9/(9+1.5)))+20
+        self.l = round((self.width-20)/9)
+        self.win = pygame.display.set_mode((self.width, self.height))
         self.font = pygame.font.SysFont("arial", 36)
         self.font_big = pygame.font.SysFont("arial", 70)
 
@@ -184,14 +184,15 @@ class Window:
         
         #Display game over / play again
         if self.game_over:
+            self.win.fill((0, 0, 0), [0, int(self.pix(9/2))-60, self.width, 120])
             self.text_centered("GAME OVER", self.pix(9/2), self.pix(9/2), True)
             
             self.replay_bt = pygame.draw.rect(self.win, 
                                            WHITE, 
-                                           [self.pix(9-2.5), 
-                                            self.pix(9+0.5), 
-                                            self.l*2.5, 
-                                            self.l//2], 2)
+                                           [int(self.pix(9-2.5)), 
+                                            int(self.pix(9+0.5)), 
+                                            int(self.l*2.5), 
+                                            int(self.l//2)], 2)
             self.text_centered("play again", self.replay_bt.centerx, self.replay_bt.centery)
 
 
@@ -233,7 +234,7 @@ if __name__=='__main__':
         s = int(args['--seed'])
     else:
         s = None
-    w = Window(seed = s, values = values)
+    w = Window(seed = s)
     w.loop()
     
 
